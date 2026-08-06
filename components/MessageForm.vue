@@ -27,7 +27,10 @@
     <!-- Images -->
     <div class="form-group">
       <label class="form-label">{{ $t('form.images') }}</label>
-      <ImageUploader @update:paths="form.imagePaths = $event" />
+      <ImageUploader
+        :initial-paths="mode === 'edit' ? (initial?.images ?? []) : []"
+        @update:paths="form.imagePaths = $event"
+      />
     </div>
 
     <!-- Custom fields -->
@@ -36,55 +39,70 @@
       <CustomFieldsEditor v-model="form.customFields" />
     </div>
 
-    <!-- Auth section (collapsible) -->
-    <details class="border border-stone-200 rounded-lg">
-      <summary class="px-4 py-3 cursor-pointer text-sm font-sans text-stone-600 hover:bg-stone-50 rounded-lg">
-        {{ mode === 'edit' ? $t('form.currentPassword') : $t('form.email') }} / {{ $t('form.password') }}
-        <span class="text-stone-400 text-xs ml-1">({{ $t('form.emailPlaceholder').split('(')[1]?.replace(')', '') }})</span>
-      </summary>
-      <div class="px-4 pb-4 pt-2 space-y-4 border-t border-stone-100">
-        <div class="form-group">
-          <label class="form-label">{{ $t('form.email') }}</label>
-          <input
-            v-model="form.email"
-            type="email"
-            class="form-input"
-            :placeholder="$t('form.emailPlaceholder')"
-          />
-        </div>
-
-        <div v-if="mode === 'create'" class="form-group">
-          <label class="form-label">{{ $t('form.password') }}</label>
-          <input
-            v-model="form.password"
-            type="password"
-            class="form-input"
-            :placeholder="$t('form.passwordPlaceholder')"
-          />
-        </div>
-
-        <template v-if="mode === 'edit'">
+    <!-- Auth section — hidden when credentials are pre-verified (edit gate) -->
+    <template v-if="!lockedCredentials">
+      <details class="border border-stone-200 rounded-lg">
+        <summary class="px-4 py-3 cursor-pointer text-sm font-sans text-stone-600 hover:bg-stone-50 rounded-lg">
+          {{ mode === 'edit' ? $t('form.currentPassword') : $t('form.email') }} / {{ $t('form.password') }}
+          <span class="text-stone-400 text-xs ml-1">({{ $t('form.emailPlaceholder').split('(')[1]?.replace(')', '') }})</span>
+        </summary>
+        <div class="px-4 pb-4 pt-2 space-y-4 border-t border-stone-100">
           <div class="form-group">
-            <label class="form-label">{{ $t('form.currentPassword') }}</label>
+            <label class="form-label">{{ $t('form.email') }}</label>
+            <input
+              v-model="form.email"
+              type="email"
+              class="form-input"
+              :placeholder="$t('form.emailPlaceholder')"
+            />
+          </div>
+
+          <div v-if="mode === 'create'" class="form-group">
+            <label class="form-label">{{ $t('form.password') }}</label>
             <input
               v-model="form.password"
               type="password"
               class="form-input"
-              :placeholder="$t('form.currentPasswordPlaceholder')"
+              :placeholder="$t('form.passwordPlaceholder')"
             />
           </div>
-          <div class="form-group">
-            <label class="form-label">{{ $t('form.newPassword') }}</label>
-            <input
-              v-model="form.newPassword"
-              type="password"
-              class="form-input"
-              :placeholder="$t('form.newPasswordPlaceholder')"
-            />
-          </div>
-        </template>
+
+          <template v-if="mode === 'edit'">
+            <div class="form-group">
+              <label class="form-label">{{ $t('form.currentPassword') }}</label>
+              <input
+                v-model="form.password"
+                type="password"
+                class="form-input"
+                :placeholder="$t('form.currentPasswordPlaceholder')"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">{{ $t('form.newPassword') }}</label>
+              <input
+                v-model="form.newPassword"
+                type="password"
+                class="form-input"
+                :placeholder="$t('form.newPasswordPlaceholder')"
+              />
+            </div>
+          </template>
+        </div>
+      </details>
+    </template>
+
+    <!-- New password change when credentials are pre-verified -->
+    <template v-else-if="mode === 'edit'">
+      <div class="form-group">
+        <label class="form-label">{{ $t('form.newPassword') }}</label>
+        <input
+          v-model="form.newPassword"
+          type="password"
+          class="form-input"
+          :placeholder="$t('form.newPasswordPlaceholder')"
+        />
       </div>
-    </details>
+    </template>
 
     <!-- Error -->
     <p v-if="errorMsg" class="text-red-600 text-sm font-sans">{{ errorMsg }}</p>
@@ -109,14 +127,16 @@ const props = defineProps<{
   mode: 'create' | 'edit'
   initial?: Message | null
   messageId?: number
+  /** Pre-verified credentials from the edit gate — skips re-entry of email/password */
+  lockedCredentials?: { email: string; password: string }
 }>()
 
 const emit = defineEmits<{
   (e: 'submitted', msg: Message): void
 }>()
 
-const { t }                                  = useI18n()
-const { createMessage, updateMessage }        = useMessages()
+const { t }                           = useI18n()
+const { createMessage, updateMessage } = useMessages()
 
 const loading  = ref(false)
 const errorMsg = ref('')
@@ -124,8 +144,8 @@ const errorMsg = ref('')
 const form = reactive({
   name:         props.initial?.name    ?? '',
   message:      props.initial?.message ?? '',
-  email:        '',
-  password:     '',
+  email:        props.lockedCredentials?.email    ?? '',
+  password:     props.lockedCredentials?.password ?? '',
   newPassword:  '',
   customFields: (props.initial?.customFields ?? {}) as Record<string, string>,
   imagePaths:   props.initial?.images ?? [] as string[],

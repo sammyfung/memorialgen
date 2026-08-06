@@ -18,6 +18,13 @@ export default defineEventHandler(async (event) => {
     if (!body?.password) throw createError({ statusCode: 403, statusMessage: 'Password required' })
     const ok = await verifyPassword(String(body.password), row.passwordHash)
     if (!ok)             throw createError({ statusCode: 403, statusMessage: 'Incorrect password' })
+
+    if (row.email) {
+      if (!body?.email) throw createError({ statusCode: 403, statusMessage: 'Email required' })
+      if (String(body.email).trim().toLowerCase() !== row.email.toLowerCase()) {
+        throw createError({ statusCode: 403, statusMessage: 'Incorrect email' })
+      }
+    }
   }
 
   // Soft delete: set active = false

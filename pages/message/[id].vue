@@ -27,17 +27,26 @@
               </template>
             </p>
           </div>
-          <button
-            v-if="message.hasPassword"
-            class="btn-secondary text-sm"
-            @click="showEdit = !showEdit"
-          >
-            {{ showEdit ? $t('form.cancel') : $t('message.edit') }}
-          </button>
+          <div class="flex gap-2">
+            <button
+              v-if="message.hasPassword && editState === 'view'"
+              class="btn-secondary text-sm"
+              @click="editState = 'gate'"
+            >
+              {{ $t('message.edit') }}
+            </button>
+            <button
+              v-if="editState !== 'view'"
+              class="btn-ghost text-sm"
+              @click="cancelEdit"
+            >
+              {{ $t('form.cancel') }}
+            </button>
+          </div>
         </div>
 
-        <!-- Message body -->
-        <div v-if="!showEdit" class="space-y-4">
+        <!-- Message body (view mode) -->
+        <div v-if="editState === 'view'" class="space-y-4">
           <p class="text-stone-700 leading-relaxed whitespace-pre-wrap">{{ message.message }}</p>
 
           <!-- Custom fields -->
@@ -70,15 +79,47 @@
           </p>
         </div>
 
-        <!-- Edit form -->
-        <div v-else>
+        <!-- Credential gate -->
+        <div v-else-if="editState === 'gate'" class="space-y-4">
+          <h2 class="text-lg font-serif text-stone-700">{{ $t('message.verifyIdentity') }}</h2>
+          <p class="text-sm text-stone-500 font-sans">{{ $t('message.verifyHint') }}</p>
+
+          <form class="space-y-4" @submit.prevent="verifyCredentials">
+            <div class="form-group">
+              <label class="form-label">{{ $t('form.email') }}</label>
+              <input
+                v-model="gateEmail"
+                type="email"
+                class="form-input"
+                :placeholder="$t('form.emailPlaceholder')"
+                autocomplete="email"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">{{ $t('form.currentPassword') }} *</label>
+              <input
+                v-model="gatePassword"
+                type="password"
+                class="form-input"
+                :placeholder="$t('form.currentPasswordPlaceholder')"
+                required
+                autocomplete="current-password"
+              />
+            </div>
+            <p v-if="gateError" class="text-red-600 text-sm font-sans">{{ gateError }}</p>
+            <button type="submit" class="btn-primary" :disabled="gateLoading">
+              {{ gateLoading ? '...' : $t('message.verifyButton') }}
+            </button>
+          </form>
+        </div>
+
+        <!-- Edit form (after credentials verified) -->
+        <div v-else-if="editState === 'edit'">
           <h2 class="text-lg font-serif text-stone-700 mb-4">{{ $t('form.editTitle') }}</h2>
 
           <div v-if="editSuccess" class="text-center space-y-3 py-6">
             <p class="text-green-600 font-sans">{{ $t('form.successEdit') }}</p>
-            <button class="btn-secondary" @click="editSuccess = false; showEdit = false; refresh()">
-              OK
-            </button>
+            <button class="btn-secondary" @click="onEditDone">OK</button>
           </div>
 
           <MessageForm
@@ -86,6 +127,7 @@
             mode="edit"
             :initial="message"
             :message-id="message.id"
+            :locked-credentials="{ email: gateEmail, password: gatePassword }"
             @submitted="onEdited"
           >
             <template #actions>
@@ -120,12 +162,20 @@ const { t }      = useI18n()
 const config     = useRuntimeConfig()
 const imageBase  = (config.public.apiBaseUrl as string) || ''
 
-const { apiFetch }     = useApi()
+const { apiFetch }      = useApi()
 const { deleteMessage } = useMessages()
 
-const id        = parseInt(String(route.params.id))
-const showEdit  = ref(false)
+const id = parseInt(String(route.params.id))
+
+// edit flow: view → gate → edit
+const editState   = ref<'view' | 'gate' | 'edit'>('view')
 const editSuccess = ref(false)
+
+// credential gate state
+const gateEmail    = ref('')
+const gatePassword = ref('')
+const gateError    = ref('')
+const gateLoading  = ref(false)
 
 const { data: message, pending, refresh } = await useAsyncData<Message | null>(
   `message-${id}`,
@@ -154,17 +204,46 @@ function formatDate(ts: number) {
   })
 }
 
+function cancelEdit() {
+  editState.value   = 'view'
+  gateError.value   = ''
+  editSuccess.value = false
+}
+
+async function verifyCredentials() {
+  gateError.value   = ''
+  gateLoading.value = true
+  try {
+    await apiFetch(`/api/messages/${id}/verify`, {
+      method: 'POST',
+      body: { email: gateEmail.value, password: gatePassword.value },
+    })
+    editState.value = 'edit'
+  } catch (e: any) {
+    gateError.value = e?.data?.statusMessage || t('errors.wrongPassword')
+  } finally {
+    gateLoading.value = false
+  }
+}
+
 function onEdited(updated: Message) {
-  message.value  = updated
+  message.value     = updated
   editSuccess.value = true
 }
 
+function onEditDone() {
+  editSuccess.value = false
+  editState.value   = 'view'
+  refresh()
+}
+
 async function confirmDelete() {
-  const pwd = prompt(t('message.passwordRequired'))
-  if (pwd === null) return
   if (!confirm(t('message.confirmDelete'))) return
   try {
-    await deleteMessage(id, pwd)
+    await apiFetch(`/api/messages/${id}`, {
+      method: 'DELETE',
+      body: { email: gateEmail.value, password: gatePassword.value },
+    })
     await navigateTo(localePath('/'))
   } catch (e: any) {
     alert(e?.data?.statusMessage || t('errors.serverError'))

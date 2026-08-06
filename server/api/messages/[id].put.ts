@@ -17,11 +17,18 @@ export default defineEventHandler(async (event) => {
   if (!row)         throw createError({ statusCode: 404, statusMessage: 'Message not found' })
   if (!row.active)  throw createError({ statusCode: 403, statusMessage: 'Message is not available' })
 
-  // Require password if one was set
+  // Require password (and email if one was stored) when a password is set
   if (row.passwordHash) {
     if (!password) throw createError({ statusCode: 403, statusMessage: 'Password required' })
     const ok = await verifyPassword(String(password), row.passwordHash)
     if (!ok)       throw createError({ statusCode: 403, statusMessage: 'Incorrect password' })
+
+    if (row.email) {
+      if (!email) throw createError({ statusCode: 403, statusMessage: 'Email required' })
+      if (String(email).trim().toLowerCase() !== row.email.toLowerCase()) {
+        throw createError({ statusCode: 403, statusMessage: 'Incorrect email' })
+      }
+    }
   }
 
   const now        = Date.now()

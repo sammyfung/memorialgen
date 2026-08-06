@@ -5,7 +5,7 @@ export interface SessionData {
   admin?: boolean
 }
 
-export async function getSession(event: H3Event) {
+export async function getAdminSession(event: H3Event) {
   const config = useRuntimeConfig()
   return getIronSession<SessionData>(event.node.req, event.node.res, {
     password: config.sessionSecret,

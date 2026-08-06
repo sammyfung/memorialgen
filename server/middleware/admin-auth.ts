@@ -1,5 +1,5 @@
 import { defineEventHandler, createError } from 'h3'
-import { getSession } from '../utils/session'
+import { getAdminSession } from '../utils/session'
 
 export default defineEventHandler(async (event) => {
   if (!event.path.startsWith('/api/admin/')) return
@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
   // Allow the login route itself
   if (event.path === '/api/admin/auth' && event.method === 'POST') return
 
-  const session = await getSession(event)
+  const session = await getAdminSession(event)
   if (!session.admin) {
     throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   }

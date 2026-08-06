@@ -54,6 +54,9 @@
     "confirmDelete": "確定要刪除此留言嗎？",
     "passwordRequired": "請輸入密碼以編輯或刪除此留言。",
     "noPassword": "此留言未設定密碼，無法編輯。",
+    "verifyIdentity": "身份驗證",
+    "verifyHint": "請輸入您提交留言時所設定的電子郵件與密碼。",
+    "verifyButton": "驗證",
     "featured": "精選",
     "images": "相片"
   },
@@ -92,6 +95,7 @@
     "dragDrop": "拖放相片至此，或點擊選擇",
     "browse": "瀏覽檔案",
     "uploading": "上傳中...",
-    "remove": "移除"
+    "remove": "移除",
+    "existing": "已儲存"
   }
 }

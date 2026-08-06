@@ -1,5 +1,38 @@
 <template>
   <div class="space-y-3">
+    <!-- Existing + new previews -->
+    <div v-if="previews.length > 0" class="grid grid-cols-3 sm:grid-cols-4 gap-2">
+      <div
+        v-for="(prev, i) in previews"
+        :key="prev.key"
+        class="relative group rounded-lg overflow-hidden aspect-square bg-stone-100"
+      >
+        <img :src="prev.src" alt="" class="w-full h-full object-cover" />
+        <div v-if="prev.uploading" class="absolute inset-0 bg-black/50 flex items-center justify-center">
+          <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+        </div>
+        <button
+          v-else
+          type="button"
+          class="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+          :aria-label="$t('upload.remove')"
+          @click.stop="removePrev(i)"
+        >
+          <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <!-- Badge for existing photos -->
+        <span
+          v-if="prev.existing"
+          class="absolute bottom-1 left-1 bg-black/50 text-white text-[10px] px-1 rounded font-sans leading-4"
+        >{{ $t('upload.existing') }}</span>
+      </div>
+    </div>
+
     <!-- Drop zone -->
     <div
       class="border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer"
@@ -24,43 +57,22 @@
       <p class="text-xs text-stone-400 mt-1">{{ $t('form.imagesHint', { max: maxSizeMb }) }}</p>
     </div>
 
-    <!-- Previews -->
-    <div v-if="previews.length > 0" class="grid grid-cols-3 sm:grid-cols-4 gap-2">
-      <div
-        v-for="(prev, i) in previews"
-        :key="i"
-        class="relative group rounded-lg overflow-hidden aspect-square bg-stone-100"
-      >
-        <img :src="prev.src" alt="" class="w-full h-full object-cover" />
-        <div v-if="prev.uploading" class="absolute inset-0 bg-black/50 flex items-center justify-center">
-          <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
-        </div>
-        <button
-          v-else
-          class="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
-          :aria-label="$t('upload.remove')"
-          @click.stop="removePrev(i)"
-        >
-          <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-    </div>
-
     <p v-if="error" class="text-red-600 text-xs font-sans">{{ error }}</p>
   </div>
 </template>
 
 <script setup lang="ts">
 interface Preview {
-  src: string
+  key:       string
+  src:       string
   uploading: boolean
-  path?: string
+  path?:     string
+  existing?: boolean
 }
+
+const props = defineProps<{
+  initialPaths?: string[]
+}>()
 
 const emit = defineEmits<{
   (e: 'update:paths', paths: string[]): void
@@ -69,12 +81,27 @@ const emit = defineEmits<{
 const { apiFetch } = useApi()
 const { t }        = useI18n()
 const config       = useRuntimeConfig()
+const imageBase    = (config.public.apiBaseUrl as string) || ''
 const maxSizeMb    = 5
 
-const fileInput = ref<HTMLInputElement>()
+const fileInput  = ref<HTMLInputElement>()
 const isDragging = ref(false)
 const previews   = ref<Preview[]>([])
 const error      = ref('')
+
+// Populate existing images on mount
+onMounted(() => {
+  if (props.initialPaths?.length) {
+    previews.value = props.initialPaths.map((path, i) => ({
+      key:      `existing-${i}`,
+      src:      imageBase + path,
+      uploading: false,
+      path,
+      existing: true,
+    }))
+    emit('update:paths', currentPaths())
+  }
+})
 
 function currentPaths(): string[] {
   return previews.value.filter(p => p.path).map(p => p.path!)
@@ -104,7 +131,7 @@ async function addFiles(files: File[]) {
     }
 
     const src     = URL.createObjectURL(file)
-    const preview: Preview = { src, uploading: true }
+    const preview: Preview = { key: `new-${Date.now()}-${file.name}`, src, uploading: true }
     previews.value.push(preview)
     const idx = previews.value.length - 1
 

@@ -1,5 +1,5 @@
 import { defineEventHandler, readBody, createError } from 'h3'
-import { getSession } from '../../utils/session'
+import { getAdminSession } from '../../utils/session'
 
 export default defineEventHandler(async (event) => {
   const body     = await readBody(event)
@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Incorrect password' })
   }
 
-  const session = await getSession(event)
+  const session = await getAdminSession(event)
   session.admin = true
   await session.save()
 

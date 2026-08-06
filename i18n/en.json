@@ -54,6 +54,9 @@
     "confirmDelete": "Are you sure you want to delete this message?",
     "passwordRequired": "Enter your password to edit or delete this message.",
     "noPassword": "This message has no password set and cannot be edited.",
+    "verifyIdentity": "Verify Your Identity",
+    "verifyHint": "Enter the email and password you set when submitting this message.",
+    "verifyButton": "Verify",
     "featured": "Featured",
     "images": "Photos"
   },
@@ -92,6 +95,7 @@
     "dragDrop": "Drag & drop photos here, or click to select",
     "browse": "Browse Files",
     "uploading": "Uploading...",
-    "remove": "Remove"
+    "remove": "Remove",
+    "existing": "Saved"
   }
 }
