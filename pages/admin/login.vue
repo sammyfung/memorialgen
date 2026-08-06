@@ -30,8 +30,9 @@ definePageMeta({ layout: false })
 
 const { t }      = useI18n()
 const localePath = useLocalePath()
+const { pageTitle } = useSiteConfig()
 
-useHead({ title: `${t('admin.login')} — ${t('site.title')}` })
+useHead({ title: pageTitle(t('admin.login')) })
 
 const { login } = useAdminAuth()
 

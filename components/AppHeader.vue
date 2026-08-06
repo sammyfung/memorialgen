@@ -6,9 +6,6 @@
       </NuxtLink>
 
       <nav class="flex items-center gap-2 flex-wrap">
-        <NuxtLink :to="localePath('/')" class="btn-ghost text-sm">
-          {{ $t('nav.home') }}
-        </NuxtLink>
         <NuxtLink :to="localePath('/submit')" class="btn-primary text-sm">
           {{ $t('nav.submit') }}
         </NuxtLink>

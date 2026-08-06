@@ -77,8 +77,9 @@ const { t }      = useI18n()
 const localePath = useLocalePath()
 const { logout } = useAdminAuth()
 const { apiFetch } = useApi()
+const { pageTitle } = useSiteConfig()
 
-useHead({ title: `${t('admin.title')} — ${t('site.title')}` })
+useHead({ title: pageTitle(t('admin.title')) })
 
 const page         = ref(1)
 const activeFilter = ref<string>('all')

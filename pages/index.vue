@@ -2,8 +2,8 @@
   <div class="max-w-6xl mx-auto px-4 py-10 space-y-12">
     <!-- Hero -->
     <div class="text-center space-y-2">
-      <h1 class="text-3xl sm:text-4xl font-serif text-stone-800">{{ $t('site.title') }}</h1>
-      <p class="text-stone-500">{{ $t('site.description') }}</p>
+      <h1 class="text-3xl sm:text-4xl font-serif text-stone-800">{{ displayTitle }}</h1>
+      <p class="text-stone-500">{{ displaySubtitle }}</p>
     </div>
 
     <!-- Loading -->
@@ -60,8 +60,9 @@
 const localePath = useLocalePath()
 const { t }      = useI18n()
 const { apiFetch } = useApi()
+const { displayTitle, displaySubtitle, pageTitle } = useSiteConfig()
 
-useHead({ title: t('site.title') })
+useHead(() => ({ title: pageTitle() }))
 
 const page = ref(1)
 

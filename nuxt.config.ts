@@ -15,11 +15,11 @@ export default defineNuxtConfig({
       { code: 'en',    language: 'en-US', file: 'en.json',    name: 'English' },
       { code: 'zh-TW', language: 'zh-TW', file: 'zh-TW.json', name: '繁體中文' },
     ],
-    defaultLocale: 'en',
+    defaultLocale: (process.env.DEFAULT_LOCALE || 'en') as 'en' | 'zh-TW',
     strategy: 'prefix_except_default',
     langDir: '../i18n/',
     lazy: true,
-    detectBrowserLanguage: {
+    detectBrowserLanguage: process.env.DETECT_BROWSER_LANGUAGE === 'false' ? false : {
       useCookie: true,
       cookieKey: 'i18n_redirected',
       redirectOn: 'root',
@@ -35,6 +35,8 @@ export default defineNuxtConfig({
     public: {
       apiBaseUrl: '',
       siteUrl: '',
+      siteTitle: '',
+      siteSubtitle: '',
     },
   },
 
@@ -47,10 +49,6 @@ export default defineNuxtConfig({
         './node_modules/better-sqlite3/**',
         './node_modules/drizzle-orm/better-sqlite3/**',
       ],
-    },
-    prerender: {
-      crawlLinks: true,
-      routes: ['/', '/zh-TW'],
     },
   },
 

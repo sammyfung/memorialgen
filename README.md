@@ -125,6 +125,9 @@ NUXT_DB_URL=mysql://user:password@localhost:3306/memorial
 | `NUXT_PUBLIC_API_BASE_URL` | _(empty)_ | External API server URL for static/GitHub Pages mode |
 | `NUXT_PUBLIC_SITE_URL` | _(empty)_ | Canonical site URL used for meta tags |
 | `NUXT_ALLOWED_ORIGIN` | `*` | CORS allowed origin when running as a separate API server |
+| `DEFAULT_LOCALE` | `en` | Default language: `en` or `zh-TW`. **Build-time only** — must be set before `npm run build` |
+| `NUXT_PUBLIC_SITE_TITLE` | _(empty)_ | Custom board title shown in the header, hero h1, and browser tab. When set, browser tab becomes `{title} \| Memorial Board` |
+| `NUXT_PUBLIC_SITE_SUBTITLE` | _(empty)_ | Custom subtitle shown below the hero title on the home page |
 
 ---
 

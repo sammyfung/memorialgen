@@ -135,9 +135,11 @@ const { data: message, pending, refresh } = await useAsyncData<Message | null>(
   }
 )
 
+const { pageTitle } = useSiteConfig()
+
 useHead(() => ({
   title: message.value
-    ? `${message.value.name} — ${t('site.title')}`
+    ? pageTitle(message.value.name)
     : t('errors.notFound'),
 }))
 

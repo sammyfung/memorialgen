@@ -32,8 +32,9 @@ import type { Message } from '~/composables/useMessages'
 
 const { t }      = useI18n()
 const localePath = useLocalePath()
+const { pageTitle } = useSiteConfig()
 
-useHead({ title: `${t('form.createTitle')} — ${t('site.title')}` })
+useHead({ title: pageTitle(t('form.createTitle')) })
 
 const submitted   = ref(false)
 const submittedId = ref<number>()
