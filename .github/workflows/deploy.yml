@@ -1,0 +1,62 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Restore a pre-seeded SQLite DB from GitHub secret (base64-encoded)
+      # OR just generate from empty DB (pages will show "no messages" until API is live)
+      - name: Prepare data directory
+        run: mkdir -p data
+
+      - name: Generate static site
+        env:
+          NUXT_DB_DIALECT: sqlite
+          NUXT_DB_URL: ./data/memorial.db
+          NUXT_PUBLIC_API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          NUXT_PUBLIC_SITE_URL: ${{ secrets.SITE_URL }}
+          NUXT_ADMIN_PASSWORD: placeholder-not-used-in-static-gen
+          NUXT_SESSION_SECRET: ${{ secrets.SESSION_SECRET || 'placeholder-for-static-generation-only' }}
+        run: npm run generate
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .output/public
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

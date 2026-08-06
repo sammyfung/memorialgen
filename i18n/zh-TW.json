@@ -1,0 +1,97 @@
+{
+  "site": {
+    "title": "紀念留言板",
+    "description": "分享您的回憶與留言"
+  },
+  "nav": {
+    "home": "紀念牆",
+    "submit": "留下留言",
+    "admin": "管理"
+  },
+  "home": {
+    "featured": "精選留言",
+    "all": "所有留言",
+    "empty": "尚無留言，成為第一個留言的人吧。",
+    "readMore": "閱讀更多"
+  },
+  "form": {
+    "createTitle": "留下留言",
+    "editTitle": "編輯留言",
+    "name": "您的姓名",
+    "namePlaceholder": "請輸入姓名",
+    "message": "您的留言",
+    "messagePlaceholder": "分享您的回憶或留言...",
+    "email": "電子郵件",
+    "emailPlaceholder": "電子郵件地址（選填，供日後編輯使用）",
+    "password": "密碼",
+    "passwordPlaceholder": "設定密碼以供日後編輯（選填）",
+    "currentPassword": "目前密碼",
+    "currentPasswordPlaceholder": "請輸入密碼以儲存變更",
+    "newPassword": "新密碼",
+    "newPasswordPlaceholder": "更改密碼（留空則保持不變）",
+    "images": "相片",
+    "imagesHint": "上傳相片（JPG、PNG、GIF、WebP — 每張最大 {max}MB）",
+    "customFields": "其他資訊",
+    "addField": "新增欄位",
+    "fieldName": "欄位名稱",
+    "fieldValue": "內容",
+    "removeField": "移除",
+    "submit": "送出",
+    "save": "儲存變更",
+    "cancel": "取消",
+    "submitting": "送出中...",
+    "saving": "儲存中...",
+    "success": "留言已成功送出！",
+    "successEdit": "留言已成功更新！",
+    "viewMessage": "查看留言"
+  },
+  "message": {
+    "by": "作者",
+    "posted": "發布於",
+    "updated": "更新於",
+    "edit": "編輯此留言",
+    "delete": "刪除",
+    "confirmDelete": "確定要刪除此留言嗎？",
+    "passwordRequired": "請輸入密碼以編輯或刪除此留言。",
+    "noPassword": "此留言未設定密碼，無法編輯。",
+    "featured": "精選",
+    "images": "相片"
+  },
+  "admin": {
+    "title": "管理後台",
+    "login": "管理員登入",
+    "password": "管理員密碼",
+    "loginButton": "登入",
+    "logout": "登出",
+    "allMessages": "所有留言",
+    "active": "顯示中",
+    "inactive": "已隱藏",
+    "highlight": "設為精選",
+    "unhighlight": "取消精選",
+    "show": "顯示",
+    "hide": "隱藏",
+    "filter": "篩選",
+    "filterAll": "全部",
+    "filterActive": "僅顯示中",
+    "filterInactive": "僅已隱藏"
+  },
+  "errors": {
+    "required": "此欄位為必填",
+    "wrongPassword": "密碼錯誤",
+    "uploadFailed": "上傳失敗",
+    "submitFailed": "送出失敗，請再試一次。",
+    "notFound": "找不到留言",
+    "serverError": "伺服器錯誤，請再試一次。"
+  },
+  "pagination": {
+    "prev": "上一頁",
+    "next": "下一頁",
+    "page": "第 {current} 頁，共 {total} 頁"
+  },
+  "upload": {
+    "dragDrop": "拖放相片至此，或點擊選擇",
+    "browse": "瀏覽檔案",
+    "uploading": "上傳中...",
+    "remove": "移除"
+  }
+}
