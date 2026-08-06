@@ -14,17 +14,41 @@
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
         </div>
-        <button
-          v-else
-          type="button"
-          class="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
-          :aria-label="$t('upload.remove')"
-          @click.stop="removePrev(i)"
-        >
-          <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+        <template v-else>
+          <!-- Remove button -->
+          <button
+            type="button"
+            class="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+            :aria-label="$t('upload.remove')"
+            @click.stop="removePrev(i)"
+          >
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <!-- Set as feature button (only when multiple images) -->
+          <button
+            v-if="readyPreviews > 1 && i !== 0"
+            type="button"
+            class="absolute top-1 left-1 bg-black/60 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+            :aria-label="'Set as feature image'"
+            @click.stop="setFeature(i)"
+          >
+            <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+          </button>
+          <!-- Feature badge on first ready image -->
+          <span
+            v-if="readyPreviews > 1 && i === 0"
+            class="absolute top-1 left-1 bg-amber-500 text-white rounded-full p-0.5"
+            :title="'Feature image'"
+          >
+            <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+          </span>
+        </template>
         <!-- Badge for existing photos -->
         <span
           v-if="prev.existing"
@@ -57,7 +81,7 @@
       <p class="text-xs text-stone-400 mt-1">{{ $t('form.imagesHint', { max: maxSizeMb }) }}</p>
     </div>
 
-    <p v-if="error" class="text-red-600 text-xs font-sans">{{ error }}</p>
+    <p v-if="error" class="text-gray-500 text-xs font-sans">{{ error }}</p>
   </div>
 </template>
 
@@ -151,6 +175,14 @@ async function addFiles(files: File[]) {
 
 function removePrev(i: number) {
   previews.value.splice(i, 1)
+  emit('update:paths', currentPaths())
+}
+
+const readyPreviews = computed(() => previews.value.filter(p => p.path && !p.uploading).length)
+
+function setFeature(i: number) {
+  const [item] = previews.value.splice(i, 1)
+  previews.value.unshift(item)
   emit('update:paths', currentPaths())
 }
 </script>
