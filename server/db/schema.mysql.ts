@@ -1,7 +1,7 @@
-import { mysqlTable, serial, int, varchar, text, boolean, bigint } from 'drizzle-orm/mysql-core'
+import { mysqlTable, int, varchar, text, boolean, bigint } from 'drizzle-orm/mysql-core'
 
 export const messages = mysqlTable('messages', {
-  id:           serial('id').primaryKey(),
+  id:           int('id').autoincrement().primaryKey(),
   name:         varchar('name', { length: 255 }).notNull(),
   message:      text('message').notNull(),
   email:        varchar('email', { length: 255 }),
@@ -14,7 +14,7 @@ export const messages = mysqlTable('messages', {
 })
 
 export const messageImages = mysqlTable('message_images', {
-  id:        serial('id').primaryKey(),
+  id:        int('id').autoincrement().primaryKey(),
   messageId: int('message_id').notNull().references(() => messages.id, { onDelete: 'cascade' }),
   path:      varchar('path', { length: 500 }).notNull(),
   order:     int('order').default(0).notNull(),
