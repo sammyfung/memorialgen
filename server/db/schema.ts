@@ -1,13 +1,14 @@
-import { createRequire } from 'node:module'
+import * as sqlite from './schema.sqlite'
+import * as mysql  from './schema.mysql'
+import * as pg     from './schema.pg'
 
-const require = createRequire(import.meta.url)
 const dialect = process.env.NUXT_DB_DIALECT || 'sqlite'
 
 const mod = dialect === 'postgres'
-  ? require('./schema.pg')
+  ? pg
   : dialect === 'mariadb'
-  ? require('./schema.mysql')
-  : require('./schema.sqlite')
+  ? mysql
+  : sqlite
 
 export const messages      = mod.messages
 export const messageImages = mod.messageImages
