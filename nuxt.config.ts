@@ -43,7 +43,7 @@ export default defineNuxtConfig({
   nitro: {
     externals: {
       // Native modules (.node bindings) must stay external (not bundled)
-      external: ['better-sqlite3', 'bcrypt', 'pg', 'mysql2'],
+      external: ['better-sqlite3', 'pg', 'mysql2'],
       // Hint the file tracer to include dynamically-loaded dependencies
       traceInclude: [
         './node_modules/better-sqlite3/**',

@@ -106,7 +106,7 @@
                 autocomplete="current-password"
               />
             </div>
-            <p v-if="gateError" class="text-red-600 text-sm font-sans">{{ gateError }}</p>
+            <p v-if="gateError" class="text-gray-500 text-sm font-sans">{{ gateError }}</p>
             <button type="submit" class="btn-primary" :disabled="gateLoading">
               {{ gateLoading ? '...' : $t('message.verifyButton') }}
             </button>

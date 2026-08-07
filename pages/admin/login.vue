@@ -15,7 +15,7 @@
           />
         </div>
 
-        <p v-if="error" class="text-red-600 text-sm font-sans">{{ $t('errors.wrongPassword') }}</p>
+        <p v-if="error" class="text-gray-500 text-sm font-sans">{{ $t('errors.wrongPassword') }}</p>
 
         <button type="submit" class="btn-primary w-full" :disabled="loading">
           {{ loading ? '...' : $t('admin.loginButton') }}

@@ -27,7 +27,7 @@
       <div class="flex gap-2 flex-wrap">
         <button
           class="btn-ghost text-xs border border-stone-200"
-          :class="message.active ? 'text-red-600 hover:bg-red-50' : 'text-green-700 hover:bg-green-50'"
+          :class="message.active ? 'text-gray-600 hover:bg-gray-100' : 'text-green-700 hover:bg-green-50'"
           @click="$emit('toggle-active', message)"
         >
           {{ message.active ? $t('admin.hide') : $t('admin.show') }}

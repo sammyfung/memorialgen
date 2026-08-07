@@ -21,7 +21,7 @@
       />
       <button
         type="button"
-        class="btn-ghost text-red-500 hover:text-red-700 px-2 shrink-0"
+        class="btn-ghost text-gray-500 hover:text-gray-700 px-2 shrink-0"
         :aria-label="$t('form.removeField')"
         @click="remove(i)"
       >
