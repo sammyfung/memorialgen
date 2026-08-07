@@ -24,12 +24,12 @@
       />
     </div>
 
-    <!-- Images (create mode only) -->
-    <div v-if="mode === 'create'" class="form-group">
+    <!-- Images -->
+    <div class="form-group">
       <label class="form-label">{{ $t('form.images') }}</label>
       <ImageUploader
-        :initial-paths="[]"
-        @update:paths="form.imagePaths = $event"
+        :initial-paths="mode === 'edit' ? (initial?.images ?? []) : []"
+        @update:paths="form.imagePaths = $event; imagesDirty = true"
       />
     </div>
 
@@ -141,6 +141,9 @@ const { createMessage, updateMessage } = useMessages()
 const loading  = ref(false)
 const errorMsg = ref('')
 
+// In edit mode the uploader is hidden — track whether the user changed images
+const imagesDirty = ref(false)
+
 const form = reactive({
   name:         props.initial?.name    ?? '',
   message:      props.initial?.message ?? '',
@@ -173,7 +176,7 @@ async function handleSubmit() {
         password:     form.password  || undefined,
         newPassword:  form.newPassword || undefined,
         customFields: Object.keys(form.customFields).length ? form.customFields : undefined,
-        imagePaths:   form.imagePaths,
+        imagePaths:   imagesDirty.value ? form.imagePaths : undefined,
       })
     }
     emit('submitted', result)
