@@ -24,17 +24,17 @@
       />
     </div>
 
-    <!-- Images -->
-    <div class="form-group">
+    <!-- Images (create mode only) -->
+    <div v-if="mode === 'create'" class="form-group">
       <label class="form-label">{{ $t('form.images') }}</label>
       <ImageUploader
-        :initial-paths="mode === 'edit' ? (initial?.images ?? []) : []"
+        :initial-paths="[]"
         @update:paths="form.imagePaths = $event"
       />
     </div>
 
-    <!-- Custom fields -->
-    <div class="form-group">
+    <!-- Custom fields (create mode only) -->
+    <div v-if="mode === 'create'" class="form-group">
       <label class="form-label">{{ $t('form.customFields') }}</label>
       <CustomFieldsEditor v-model="form.customFields" />
     </div>
@@ -48,7 +48,7 @@
         </summary>
         <div class="px-4 pb-4 pt-2 space-y-4 border-t border-stone-100">
           <div class="form-group">
-            <label class="form-label">{{ $t('form.email') }}</label>
+            <label class="form-label">{{ $t('form.email') }} <span class="text-stone-400 font-normal text-xs">({{ $t('form.optional') }})</span></label>
             <input
               v-model="form.email"
               type="email"
@@ -58,7 +58,7 @@
           </div>
 
           <div v-if="mode === 'create'" class="form-group">
-            <label class="form-label">{{ $t('form.password') }}</label>
+            <label class="form-label">{{ $t('form.password') }} <span class="text-stone-400 font-normal text-xs">({{ $t('form.optional') }})</span></label>
             <input
               v-model="form.password"
               type="password"
@@ -69,7 +69,7 @@
 
           <template v-if="mode === 'edit'">
             <div class="form-group">
-              <label class="form-label">{{ $t('form.currentPassword') }}</label>
+              <label class="form-label">{{ $t('form.currentPassword') }} <span class="text-stone-400 font-normal text-xs">({{ $t('form.optional') }})</span></label>
               <input
                 v-model="form.password"
                 type="password"
@@ -78,7 +78,7 @@
               />
             </div>
             <div class="form-group">
-              <label class="form-label">{{ $t('form.newPassword') }}</label>
+              <label class="form-label">{{ $t('form.newPassword') }} <span class="text-stone-400 font-normal text-xs">({{ $t('form.optional') }})</span></label>
               <input
                 v-model="form.newPassword"
                 type="password"
@@ -94,7 +94,7 @@
     <!-- New password change when credentials are pre-verified -->
     <template v-else-if="mode === 'edit'">
       <div class="form-group">
-        <label class="form-label">{{ $t('form.newPassword') }}</label>
+        <label class="form-label">{{ $t('form.newPassword') }} <span class="text-stone-400 font-normal text-xs">({{ $t('form.optional') }})</span></label>
         <input
           v-model="form.newPassword"
           type="password"
@@ -105,7 +105,7 @@
     </template>
 
     <!-- Error -->
-    <p v-if="errorMsg" class="text-red-600 text-sm font-sans">{{ errorMsg }}</p>
+    <p v-if="errorMsg" class="text-gray-500 text-sm font-sans">{{ errorMsg }}</p>
 
     <!-- Actions -->
     <div class="flex gap-3">

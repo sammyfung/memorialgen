@@ -43,7 +43,8 @@
     "saving": "Saving...",
     "success": "Message submitted successfully!",
     "successEdit": "Message updated successfully!",
-    "viewMessage": "View Message"
+    "viewMessage": "View Message",
+    "optional": "optional"
   },
   "message": {
     "by": "By",
