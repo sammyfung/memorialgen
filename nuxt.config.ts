@@ -37,6 +37,7 @@ export default defineNuxtConfig({
       siteUrl: '',
       siteTitle: '',
       siteSubtitle: '',
+      noindex: true,
     },
   },
 

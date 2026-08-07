@@ -4,7 +4,7 @@ const dialect = (process.env.NUXT_DB_DIALECT || process.env.DB_DIALECT || 'sqlit
 
 const configs: Record<string, Config> = {
   sqlite: {
-    schema: './server/db/schema.ts',
+    schema: './server/db/schema.sqlite.ts',
     out: './server/db/migrations',
     dialect: 'sqlite',
     dbCredentials: {
@@ -12,7 +12,7 @@ const configs: Record<string, Config> = {
     },
   } as Config,
   postgres: {
-    schema: './server/db/schema.ts',
+    schema: './server/db/schema.pg.ts',
     out: './server/db/migrations',
     dialect: 'postgresql',
     dbCredentials: {
@@ -20,7 +20,7 @@ const configs: Record<string, Config> = {
     },
   } as Config,
   mariadb: {
-    schema: './server/db/schema.ts',
+    schema: './server/db/schema.mysql.ts',
     out: './server/db/migrations',
     dialect: 'mysql',
     dbCredentials: {

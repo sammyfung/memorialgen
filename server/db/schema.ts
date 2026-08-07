@@ -1,25 +1,35 @@
-import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core'
+import { createRequire } from 'node:module'
 
-export const messages = sqliteTable('messages', {
-  id:           integer('id').primaryKey({ autoIncrement: true }),
-  name:         text('name').notNull(),
-  message:      text('message').notNull(),
-  email:        text('email'),
-  passwordHash: text('password_hash'),
-  highlight:    integer('highlight', { mode: 'boolean' }).default(false).notNull(),
-  active:       integer('active', { mode: 'boolean' }).default(true).notNull(),
-  customFields: text('custom_fields'),  // JSON string: { "fieldName": "value" }
-  createTime:   integer('create_time').notNull(),
-  updateTime:   integer('update_time').notNull(),
-})
+const require = createRequire(import.meta.url)
+const dialect = process.env.NUXT_DB_DIALECT || 'sqlite'
 
-export const messageImages = sqliteTable('message_images', {
-  id:        integer('id').primaryKey({ autoIncrement: true }),
-  messageId: integer('message_id').notNull().references(() => messages.id, { onDelete: 'cascade' }),
-  path:      text('path').notNull(),   // e.g. /uploads/uuid-filename.jpg
-  order:     integer('order').default(0).notNull(),
-})
+const mod = dialect === 'postgres'
+  ? require('./schema.pg')
+  : dialect === 'mariadb'
+  ? require('./schema.mysql')
+  : require('./schema.sqlite')
 
-export type Message      = typeof messages.$inferSelect
-export type NewMessage   = typeof messages.$inferInsert
-export type MessageImage = typeof messageImages.$inferSelect
+export const messages      = mod.messages
+export const messageImages = mod.messageImages
+
+// Explicit types consistent across all dialects
+export type Message = {
+  id:           number
+  name:         string
+  message:      string
+  email:        string | null
+  passwordHash: string | null
+  highlight:    boolean
+  active:       boolean
+  customFields: string | null
+  createTime:   number
+  updateTime:   number
+}
+
+export type NewMessage   = Omit<Message, 'id'>
+export type MessageImage = {
+  id:        number
+  messageId: number
+  path:      string
+  order:     number
+}

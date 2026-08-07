@@ -21,4 +21,9 @@
 
 <script setup lang="ts">
 const { displayTitle } = useSiteConfig()
+const config = useRuntimeConfig()
+
+if (config.public.noindex) {
+  useHead({ meta: [{ name: 'robots', content: 'noindex, nofollow' }] })
+}
 </script>
