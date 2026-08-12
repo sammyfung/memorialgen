@@ -77,7 +77,10 @@
     "filter": "Filter",
     "filterAll": "All",
     "filterActive": "Active only",
-    "filterInactive": "Inactive only"
+    "filterInactive": "Inactive only",
+    "touchTime": "Update to current time",
+    "edit": "Edit message",
+    "view": "View in new tab"
   },
   "errors": {
     "required": "This field is required",

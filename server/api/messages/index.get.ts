@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
   const [totalResult, rows] = await Promise.all([
     db.select({ count: count() }).from(messages).where(where),
     db.select().from(messages).where(where)
-      .orderBy(desc(messages.highlight), desc(messages.createTime))
+      .orderBy(desc(messages.highlight), desc(messages.updateTime))
       .limit(limit)
       .offset(offset),
   ])

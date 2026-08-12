@@ -38,8 +38,6 @@
             <th class="px-4 py-3">Name</th>
             <th class="px-4 py-3">Message</th>
             <th class="px-4 py-3">Date</th>
-            <th class="px-4 py-3 text-center">Active</th>
-            <th class="px-4 py-3 text-center">Featured</th>
             <th class="px-4 py-3">Actions</th>
           </tr>
         </thead>
@@ -50,6 +48,7 @@
             :message="msg"
             @toggle-active="toggleActive"
             @toggle-highlight="toggleHighlight"
+            @touch="touchMessage"
           />
         </tbody>
       </table>
@@ -119,6 +118,11 @@ async function toggleHighlight(msg: any) {
     method: 'PATCH',
     body: { highlight: !msg.highlight },
   })
+  refresh()
+}
+
+async function touchMessage(msg: any) {
+  await apiFetch(`/api/admin/messages/${msg.id}/touch`, { method: 'PATCH' })
   refresh()
 }
 </script>

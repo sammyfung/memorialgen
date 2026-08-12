@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm'
 import { getDb } from '../../db/index'
 import { messages, messageImages } from '../../db/schema'
 import { verifyPassword, hashPassword } from '../../utils/password'
+import { getAdminSession } from '../../utils/session'
 
 export default defineEventHandler(async (event) => {
   const id = parseInt(getRouterParam(event, 'id') ?? '')
@@ -14,19 +15,25 @@ export default defineEventHandler(async (event) => {
   const db    = getDb()
   const [row] = await db.select().from(messages).where(eq(messages.id, id))
 
-  if (!row)         throw createError({ statusCode: 404, statusMessage: 'Message not found' })
-  if (!row.active)  throw createError({ statusCode: 403, statusMessage: 'Message is not available' })
+  if (!row) throw createError({ statusCode: 404, statusMessage: 'Message not found' })
 
-  // Require password (and email if one was stored) when a password is set
-  if (row.passwordHash) {
-    if (!password) throw createError({ statusCode: 403, statusMessage: 'Password required' })
-    const ok = await verifyPassword(String(password), row.passwordHash)
-    if (!ok)       throw createError({ statusCode: 403, statusMessage: 'Incorrect password' })
+  const session = await getAdminSession(event)
+  const isAdmin = !!session.admin
 
-    if (row.email) {
-      if (!email) throw createError({ statusCode: 403, statusMessage: 'Email required' })
-      if (String(email).trim().toLowerCase() !== row.email.toLowerCase()) {
-        throw createError({ statusCode: 403, statusMessage: 'Incorrect email' })
+  if (!isAdmin) {
+    if (!row.active) throw createError({ statusCode: 403, statusMessage: 'Message is not available' })
+
+    // Require password (and email if one was stored) when a password is set
+    if (row.passwordHash) {
+      if (!password) throw createError({ statusCode: 403, statusMessage: 'Password required' })
+      const ok = await verifyPassword(String(password), row.passwordHash)
+      if (!ok)       throw createError({ statusCode: 403, statusMessage: 'Incorrect password' })
+
+      if (row.email) {
+        if (!email) throw createError({ statusCode: 403, statusMessage: 'Email required' })
+        if (String(email).trim().toLowerCase() !== row.email.toLowerCase()) {
+          throw createError({ statusCode: 403, statusMessage: 'Incorrect email' })
+        }
       }
     }
   }

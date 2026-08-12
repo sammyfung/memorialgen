@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm'
 import { getDb } from '../../db/index'
 import { messages } from '../../db/schema'
 import { verifyPassword } from '../../utils/password'
+import { getAdminSession } from '../../utils/session'
 
 export default defineEventHandler(async (event) => {
   const id = parseInt(getRouterParam(event, 'id') ?? '')
@@ -14,7 +15,10 @@ export default defineEventHandler(async (event) => {
 
   if (!row) throw createError({ statusCode: 404, statusMessage: 'Message not found' })
 
-  if (row.passwordHash) {
+  const session = await getAdminSession(event)
+  const isAdmin = !!session.admin
+
+  if (!isAdmin && row.passwordHash) {
     if (!body?.password) throw createError({ statusCode: 403, statusMessage: 'Password required' })
     const ok = await verifyPassword(String(body.password), row.passwordHash)
     if (!ok)             throw createError({ statusCode: 403, statusMessage: 'Incorrect password' })

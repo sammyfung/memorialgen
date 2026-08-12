@@ -29,7 +29,14 @@
           </div>
           <div class="flex gap-2">
             <button
-              v-if="message.hasPassword && editState === 'view'"
+              v-if="isAdmin && editState === 'view'"
+              class="btn-secondary text-sm"
+              @click="editState = 'edit'"
+            >
+              {{ $t('message.edit') }}
+            </button>
+            <button
+              v-else-if="message.hasPassword && editState === 'view'"
               class="btn-secondary text-sm"
               @click="editState = 'gate'"
             >
@@ -127,7 +134,7 @@
             mode="edit"
             :initial="message"
             :message-id="message.id"
-            :locked-credentials="{ email: gateEmail, password: gatePassword }"
+            :locked-credentials="isAdmin ? { email: '', password: '' } : { email: gateEmail, password: gatePassword }"
             @submitted="onEdited"
           >
             <template #actions>
@@ -176,6 +183,17 @@ const gateEmail    = ref('')
 const gatePassword = ref('')
 const gateError    = ref('')
 const gateLoading  = ref(false)
+
+// admin check
+const isAdmin = ref(false)
+onMounted(async () => {
+  try {
+    await apiFetch('/api/admin/messages', { query: { limit: 1 } })
+    isAdmin.value = true
+  } catch {
+    isAdmin.value = false
+  }
+})
 
 const { data: message, pending, refresh } = await useAsyncData<Message | null>(
   `message-${id}`,

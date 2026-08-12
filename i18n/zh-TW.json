@@ -77,7 +77,10 @@
     "filter": "篩選",
     "filterAll": "全部",
     "filterActive": "僅顯示中",
-    "filterInactive": "僅已隱藏"
+    "filterInactive": "僅已隱藏",
+    "touchTime": "更新為現在時間",
+    "edit": "編輯留言",
+    "view": "在新分頁開啟"
   },
   "errors": {
     "required": "此欄位為必填",

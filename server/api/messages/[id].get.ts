@@ -2,15 +2,19 @@ import { defineEventHandler, getRouterParam, createError } from 'h3'
 import { eq, and } from 'drizzle-orm'
 import { getDb } from '../../db/index'
 import { messages, messageImages } from '../../db/schema'
+import { getAdminSession } from '../../utils/session'
 
 export default defineEventHandler(async (event) => {
   const id = parseInt(getRouterParam(event, 'id') ?? '')
   if (isNaN(id)) throw createError({ statusCode: 400, statusMessage: 'Invalid id' })
 
+  const session = await getAdminSession(event)
+  const isAdmin = !!session.admin
+
   const db = getDb()
 
   const [row] = await db.select().from(messages)
-    .where(and(eq(messages.id, id), eq(messages.active, true)))
+    .where(isAdmin ? eq(messages.id, id) : and(eq(messages.id, id), eq(messages.active, true)))
 
   if (!row) throw createError({ statusCode: 404, statusMessage: 'Message not found' })
 

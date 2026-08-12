@@ -33,6 +33,10 @@
     @apply btn bg-transparent text-stone-600 hover:bg-stone-100 focus:ring-stone-400;
   }
 
+  .icon-btn {
+    @apply inline-flex items-center justify-center w-7 h-7 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-stone-400;
+  }
+
   .form-input {
     @apply block w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm font-sans shadow-sm focus:border-memorial-500 focus:outline-none focus:ring-1 focus:ring-memorial-500;
   }
